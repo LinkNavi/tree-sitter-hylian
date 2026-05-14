@@ -10,14 +10,21 @@
   "break"
   "continue"
   "defer"
-  "match"
-  "unsafe"
+  "switch"
+  "case"
+  "default"
 ] @keyword
+
+[
+  "unsafe"
+  "volatile"
+] @keyword.unsafe
 
 [
   "class"
   "public"
   "private"
+  "enum"
 ] @keyword.type
 
 [
@@ -25,15 +32,19 @@
 ] @keyword.operator
 
 [
+  "cast"
+  "size_of"
+  "addrof_fn"
+  "adrof_fn"
+] @keyword.operator
+
+
+[
   "include"
   "ccpinclude"
 ] @keyword.import
 
-[
-  "const"
-  "static"
-  "extern"
-] @keyword.modifier
+[ "static" "const" ] @keyword.modifier
 
 ; ── Types ───────────────────────────────────────────────────────────────────
 
@@ -46,9 +57,14 @@
   "array"
   "multi"
   "any"
+  "usize"
+  "isize"
 ] @type.builtin
 
 (class_decl
+  name: (identifier) @type)
+
+(enum_decl
   name: (identifier) @type)
 
 (new_expr
@@ -73,6 +89,11 @@
 (func_decl
   return_type: (type
     (identifier) @type))
+
+; ── Enum variants ────────────────────────────────────────────────────────────
+
+(enum_variant
+  name: (identifier) @constant)
 
 ; ── Functions and methods ────────────────────────────────────────────────────
 
@@ -105,7 +126,17 @@
 (var_decl_stmt
   name: (identifier) @variable)
 
+(static_var_stmt
+  name: (identifier) @variable)
+
+(const_var_stmt
+  name: (identifier) @variable)
+
+(static_array_stmt
+  name: (identifier) @variable)
+
 (declare_assign_stmt
+
   name: (identifier) @variable)
 
 (for_in_stmt
@@ -131,7 +162,8 @@
   "==" "!=" "<"  ">"  "<=" ">="
   "&&" "||" "!"
   "++" "--"
-  "|"  "&"
+  "|"  "&"  "^"  "~"
+  "<<"  ">>"
   "?"
 ] @operator
 
@@ -142,7 +174,7 @@
 [ "[" "]" ] @punctuation.bracket
 [ "<" ">" ] @punctuation.bracket
 
-[ "." "," ";" ] @punctuation.delimiter
+[ "." "," ";" ":" ] @punctuation.delimiter
 
 ; ── Literals ─────────────────────────────────────────────────────────────────
 
@@ -153,7 +185,7 @@
 
 [ "true" "false" ] @boolean
 
-"nil" @constant.builtin
+(nil_literal) @constant.builtin
 
 ; ── Comments ─────────────────────────────────────────────────────────────────
 

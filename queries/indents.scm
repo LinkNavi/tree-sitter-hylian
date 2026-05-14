@@ -1,46 +1,40 @@
-; ── Hylian indentation rules ─────────────────────────────────────────────────
-;
-; Zed uses Tree-sitter to determine how much to indent the next line after the
-; user presses Enter.  The two captures used here are:
-;
-;   @indent  – the node whose body should be indented one level deeper
-;   @end     – the closing token that ends that indented region
-;
-; ─────────────────────────────────────────────────────────────────────────────
-
 ; Blocks: { … }
 (block "}" @end) @indent
 
-; Class bodies: class Foo { … }
+; Class bodies
 (class_decl "{" "}" @end) @indent
 
-; if / else branches
+; if / else
 (if_stmt
-  consequence: (block "}" @end)) @indent
+  then: (block "}" @end)) @indent
 
 (if_stmt
-  alternative: (block "}" @end)) @indent
+  else: (block "}" @end)) @indent
 
-; while loops
+; while
 (while_stmt
-  body: (block "}" @end)) @indent
+  (block "}" @end)) @indent
 
-; for loops
+; for
 (for_stmt
-  body: (block "}" @end)) @indent
+  (block "}" @end)) @indent
 
-; for-in loops
+; for-in
 (for_in_stmt
-  body: (block "}" @end)) @indent
+  (block "}" @end)) @indent
 
-; Function bodies
+; switch
+(switch_stmt "{" "}" @end) @indent
+
+; unsafe
+(unsafe_block "{" "}" @end) @indent
+
+; func / method / ctor
 (func_decl
-  body: (block "}" @end)) @indent
+  (block "}" @end)) @indent
 
-; Method bodies
 (method_decl
-  body: (block "}" @end)) @indent
+  (block "}" @end)) @indent
 
-; Constructor bodies
 (ctor_decl
-  body: (block "}" @end)) @indent
+  (block "}" @end)) @indent

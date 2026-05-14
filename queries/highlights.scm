@@ -44,10 +44,7 @@
   "ccpinclude"
 ] @keyword.import
 
-[
-  (static)
-  (const)
-] @keyword.modifier
+[ "static" ] @keyword.modifier
 
 ; ── Types ───────────────────────────────────────────────────────────────────
 

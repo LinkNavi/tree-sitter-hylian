@@ -1,40 +1,23 @@
-; Blocks: { … }
-(block "}" @end) @indent
+; ── Indent begin (opening braces / block starters) ──────────────────────────
 
-; Class bodies
-(class_decl "{" "}" @end) @indent
+[
+  (block)
+  (class_body)
+  (switch_stmt)
+  (unsafe_block)
+  (enum_decl)
+] @indent.begin
 
-; if / else
-(if_stmt
-  then: (block "}" @end)) @indent
+; ── Indent end (closing braces dedent) ──────────────────────────────────────
 
-(if_stmt
-  else: (block "}" @end)) @indent
+[
+  "}"
+] @indent.end
 
-; while
-(while_stmt
-  (block "}" @end)) @indent
+; ── Branch (else / case / default stay at same level as opener) ─────────────
 
-; for
-(for_stmt
-  (block "}" @end)) @indent
-
-; for-in
-(for_in_stmt
-  (block "}" @end)) @indent
-
-; switch
-(switch_stmt "{" "}" @end) @indent
-
-; unsafe
-(unsafe_block "{" "}" @end) @indent
-
-; func / method / ctor
-(func_decl
-  (block "}" @end)) @indent
-
-(method_decl
-  (block "}" @end)) @indent
-
-(ctor_decl
-  (block "}" @end)) @indent
+[
+  "else"
+  "case"
+  "default"
+] @indent.branch

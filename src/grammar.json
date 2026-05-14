@@ -30,6 +30,14 @@
           },
           {
             "type": "SYMBOL",
+            "name": "const_var_stmt"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "static_array_stmt"
+          },
+          {
+            "type": "SYMBOL",
             "name": "enum_decl"
           }
         ]
@@ -431,6 +439,18 @@
         {
           "type": "STRING",
           "value": "void"
+        },
+        {
+          "type": "STRING",
+          "value": "float"
+        },
+        {
+          "type": "STRING",
+          "value": "float32"
+        },
+        {
+          "type": "STRING",
+          "value": "float64"
         },
         {
           "type": "STRING",
@@ -1068,6 +1088,18 @@
         {
           "type": "SYMBOL",
           "name": "volatile_read_stmt"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "deref_write_stmt"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "const_var_stmt"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "static_array_stmt"
         },
         {
           "type": "SYMBOL",
@@ -1833,6 +1865,47 @@
         }
       ]
     },
+    "deref_write_stmt": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "*"
+        },
+        {
+          "type": "FIELD",
+          "name": "ptr",
+          "content": {
+            "type": "SYMBOL",
+            "name": "expression"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "="
+        },
+        {
+          "type": "FIELD",
+          "name": "value",
+          "content": {
+            "type": "SYMBOL",
+            "name": "expression"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "static": {
+      "type": "STRING",
+      "value": "static"
+    },
+    "const": {
+      "type": "STRING",
+      "value": "const"
+    },
     "static_var_stmt": {
       "type": "SEQ",
       "members": [
@@ -1849,8 +1922,8 @@
           ]
         },
         {
-          "type": "STRING",
-          "value": "static"
+          "type": "SYMBOL",
+          "name": "static"
         },
         {
           "type": "FIELD",
@@ -1892,6 +1965,116 @@
               "type": "BLANK"
             }
           ]
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "const_var_stmt": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "public"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "const"
+        },
+        {
+          "type": "FIELD",
+          "name": "type",
+          "content": {
+            "type": "SYMBOL",
+            "name": "type"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "="
+        },
+        {
+          "type": "FIELD",
+          "name": "value",
+          "content": {
+            "type": "SYMBOL",
+            "name": "expression"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "static_array_stmt": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "public"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "static"
+        },
+        {
+          "type": "FIELD",
+          "name": "type",
+          "content": {
+            "type": "SYMBOL",
+            "name": "type"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "["
+        },
+        {
+          "type": "FIELD",
+          "name": "size",
+          "content": {
+            "type": "SYMBOL",
+            "name": "integer_literal"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "]"
         },
         {
           "type": "STRING",

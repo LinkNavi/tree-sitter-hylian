@@ -346,6 +346,52 @@
     }
   },
   {
+    "type": "const_var_stmt",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "const",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "continue_stmt",
     "named": true,
     "fields": {}
@@ -426,6 +472,32 @@
     "named": true,
     "fields": {
       "operand": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "deref_write_stmt",
+    "named": true,
+    "fields": {
+      "ptr": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "value": {
         "multiple": false,
         "required": true,
         "types": [
@@ -1259,6 +1331,10 @@
           "named": true
         },
         {
+          "type": "const_var_stmt",
+          "named": true
+        },
+        {
           "type": "enum_decl",
           "named": true
         },
@@ -1268,6 +1344,10 @@
         },
         {
           "type": "include_stmt",
+          "named": true
+        },
+        {
+          "type": "static_array_stmt",
           "named": true
         },
         {
@@ -1302,6 +1382,10 @@
           "named": true
         },
         {
+          "type": "const_var_stmt",
+          "named": true
+        },
+        {
           "type": "continue_stmt",
           "named": true
         },
@@ -1311,6 +1395,10 @@
         },
         {
           "type": "defer_stmt",
+          "named": true
+        },
+        {
+          "type": "deref_write_stmt",
           "named": true
         },
         {
@@ -1342,6 +1430,10 @@
           "named": true
         },
         {
+          "type": "static_array_stmt",
+          "named": true
+        },
+        {
           "type": "switch_stmt",
           "named": true
         },
@@ -1363,6 +1455,52 @@
         },
         {
           "type": "while_stmt",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "static_array_stmt",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "size": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "integer_literal",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "static",
           "named": true
         }
       ]
@@ -1402,6 +1540,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "static",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1895,6 +2043,10 @@
     "named": false
   },
   {
+    "type": "const",
+    "named": true
+  },
+  {
     "type": "continue",
     "named": false
   },
@@ -1916,6 +2068,18 @@
   },
   {
     "type": "false",
+    "named": false
+  },
+  {
+    "type": "float",
+    "named": false
+  },
+  {
+    "type": "float32",
+    "named": false
+  },
+  {
+    "type": "float64",
     "named": false
   },
   {
@@ -2017,7 +2181,7 @@
   },
   {
     "type": "static",
-    "named": false
+    "named": true
   },
   {
     "type": "str",

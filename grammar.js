@@ -365,11 +365,14 @@ module.exports = grammar({
         ";",
       ),
 
-    // ── Static global variable ────────────────────────────────────────────────
+    // ── Modifier keywords / Static & const globals ─────────────────────────
+    static: (_) => "static",
+    const: (_) => "const",
+
     static_var_stmt: ($) =>
       seq(
         optional("public"),
-        "static",
+        $.static,
         field("type", $.type),
         field("name", $.identifier),
         optional(seq("=", field("value", $.expression))),
@@ -379,7 +382,7 @@ module.exports = grammar({
     const_var_stmt: ($) =>
       seq(
         optional("public"),
-        "const",
+        $.const,
         field("type", $.type),
         field("name", $.identifier),
         "=",
@@ -390,7 +393,7 @@ module.exports = grammar({
     static_array_stmt: ($) =>
       seq(
         optional("public"),
-        "static",
+        $.static,
         field("type", $.type),
         field("name", $.identifier),
         "[",

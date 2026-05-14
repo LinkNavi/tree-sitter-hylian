@@ -33,6 +33,7 @@
 
 [
   "cast"
+  "as"
   "size_of"
   "addrof_fn"
   "adrof_fn"
@@ -71,6 +72,9 @@
   name: (identifier) @type)
 
 (new_expr
+  class: (identifier) @type)
+
+(struct_literal_expr
   class: (identifier) @type)
 
 (var_decl_stmt
@@ -189,6 +193,9 @@
 [ "true" "false" ] @boolean
 
 (nil_literal) @constant.builtin
+
+; `null` is treated as nil
+"null" @constant.builtin
 
 ; ── Comments ─────────────────────────────────────────────────────────────────
 

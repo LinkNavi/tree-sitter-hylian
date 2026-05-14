@@ -214,6 +214,7 @@ module.exports = grammar({
         $.volatile_write_stmt,
         $.volatile_read_stmt,
         $.deref_write_stmt,
+        $.static_var_stmt /* function-local statics */,
         $.const_var_stmt,
         $.static_array_stmt,
         $.expr_stmt,
@@ -435,7 +436,9 @@ module.exports = grammar({
         $.tuple_expr,
         $.volatile_read_expr,
         $.cast_expr,
+        $.as_cast_expr,
         $.size_of_expr,
+        $.struct_literal_expr,
         $.addrof_fn_expr,
         $.addrof_expr,
         $.deref_expr,
@@ -487,6 +490,12 @@ module.exports = grammar({
           field("expr", $.expression),
           ")",
         ),
+      ),
+
+    as_cast_expr: ($) =>
+      prec.left(
+        8,
+        seq(field("expr", $.expression), "as", field("target_type", $.type)),
       ),
 
     size_of_expr: ($) =>
@@ -557,6 +566,22 @@ module.exports = grammar({
     new_expr: ($) =>
       seq("new", field("class", $.identifier), "(", optional($.arg_list), ")"),
 
+    struct_literal_expr: ($) =>
+      prec(
+        9,
+        seq(
+          field("class", $.identifier),
+          "{",
+          optional($.field_init_list),
+          "}",
+        ),
+      ),
+
+    field_init_list: ($) =>
+      commaSep1(
+        seq(field("name", $.identifier), ":", field("value", $.expression)),
+      ),
+
     arg_list: ($) => commaSep1($.expression),
 
     array_literal: ($) => seq("[", optional($.arg_list), "]"),
@@ -575,11 +600,12 @@ module.exports = grammar({
 
     float_literal: (_) => token(seq(/[0-9]+/, ".", /[0-9]+/)),
 
-    integer_literal: (_) => token(choice(/0[xX][0-9a-fA-F]+/, /[0-9]+/)),
+    integer_literal: (_) =>
+      token(choice(/0[xX][0-9a-fA-F][0-9a-fA-F_]*/, /[0-9][0-9_]*/)),
 
     bool_literal: (_) => choice("true", "false"),
 
-    nil_literal: (_) => "nil",
+    nil_literal: (_) => choice("nil", "null"),
 
     identifier_expr: ($) => $.identifier,
 

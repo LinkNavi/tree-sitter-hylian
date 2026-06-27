@@ -21,9 +21,9 @@
 ] @keyword.unsafe
 
 [
-  (naked)
-  (packed)
-  (extern)
+  "naked"
+  "packed"
+  "extern"
 ] @keyword.unsafe
 
 [

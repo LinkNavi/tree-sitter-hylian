@@ -18,19 +18,22 @@
 [
   "unsafe"
   "volatile"
-  "naked"
-  "packed"
-  "extern"
+] @keyword.unsafe
+
+[
+  (naked)
+  (packed)
+  (extern)
 ] @keyword.unsafe
 
 [
   "class"
   "union"
-  "public"
-  "private"
   "enum"
   "module"
   "fn"
+  (public)
+  (private)
 ] @keyword.type
 
 [

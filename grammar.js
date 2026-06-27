@@ -479,6 +479,7 @@ module.exports = grammar({
     // ── Expressions ──────────────────────────────────────────────────────────
     expression: ($) =>
       choice(
+        $.ternary_expr,
         $.binary_expr,
         $.unary_expr,
         $.postfix_expr,
@@ -508,6 +509,20 @@ module.exports = grammar({
       ),
 
     paren_expr: ($) => seq("(", $.expression, ")"),
+
+    // ── Ternary conditional ─────────────────────────────────────────────────
+    // condition ? true_expr : false_expr
+    ternary_expr: ($) =>
+      prec.right(
+        1,
+        seq(
+          field("condition", $.expression),
+          "?",
+          field("then", $.expression),
+          ":",
+          field("else", $.expression),
+        ),
+      ),
 
     tuple_expr: ($) =>
       seq("(", $.expression, repeat1(seq(",", $.expression)), ")"),

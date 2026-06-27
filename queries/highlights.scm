@@ -184,6 +184,12 @@
 (member_assign_stmt
   member: (identifier) @property)
 
+; ── Ternary conditional ────────────────────────────────────────────────────
+
+(ternary_expr
+  "?" @keyword.conditional
+  ":" @keyword.conditional)
+
 ; ── Operators ────────────────────────────────────────────────────────────────
 
 [

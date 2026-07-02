@@ -32,8 +32,8 @@
   "enum"
   "module"
   "fn"
-  (public)
-  (private)
+  "public"
+  "private"
 ] @keyword.type
 
 [
@@ -55,13 +55,13 @@
 ] @keyword.import
 
 [
-  (static)
-  (const)
-  (naked)
-  (packed)
-  (public)
-  (private)
-  (extern)
+  "static"
+  "const"
+  "naked"
+  "packed"
+  "public"
+  "private"
+  "extern"
 ] @keyword.modifier
 
 ; ── Types ───────────────────────────────────────────────────────────────────

@@ -42,6 +42,16 @@
 (func_decl
   name: (identifier) @name) @item
 
+; ── Interface declarations (.hyi fn signatures) ────────────────────────
+
+(interface_decl
+  name: (identifier) @name) @item
+
+; ── Structs ─────────────────────────────────────────────────────────────────
+
+(struct_decl
+  name: (identifier) @name) @item
+
 ; ── Classes ───────────────────────────────────────────────────────────────────
 
 (class_decl

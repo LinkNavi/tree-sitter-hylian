@@ -23,11 +23,11 @@
 [
   "naked"
   "packed"
-  "extern"
 ] @keyword.unsafe
 
 [
   "class"
+  "struct"
   "union"
   "enum"
   "module"
@@ -52,16 +52,17 @@
 [
   "include"
   "ccpinclude"
+  "link"
+  "pkg"
 ] @keyword.import
 
 [
-  "static"
-  "const"
+  (static)
+  (const)
   "naked"
   "packed"
   "public"
   "private"
-  "extern"
 ] @keyword.modifier
 
 ; ── Types ───────────────────────────────────────────────────────────────────
@@ -86,6 +87,9 @@
   name: (identifier) @type)
 
 (enum_decl
+  name: (identifier) @type)
+
+(struct_decl
   name: (identifier) @type)
 
 (new_expr
@@ -118,10 +122,21 @@
   type: (type
     (identifier) @type))
 
+(struct_field
+  type: (type
+    (identifier) @type))
+
 ; ── Enum variants ────────────────────────────────────────────────────────────
 
 (enum_variant
   name: (identifier) @constant)
+
+(hyi_const_decl
+  name: (identifier) @constant)
+
+(hyi_const_value
+  (identifier) @function.call
+  "(")
 
 ; ── Functions and methods ────────────────────────────────────────────────────
 
@@ -179,6 +194,9 @@
   name: (identifier) @property)
 
 (union_field_decl
+  name: (identifier) @property)
+
+(struct_field
   name: (identifier) @property)
 
 (member_expr

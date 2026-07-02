@@ -20,6 +20,7 @@ module.exports = grammar({
     [$.ref_type, $.postfix_ref_type],
     [$.interface_decl, $.postfix_ref_type],
     [$.cast_expr, $.binary_expr],
+    [$.hyi_const_decl, $.const],
   ],
 
   rules: {
@@ -28,6 +29,10 @@ module.exports = grammar({
         choice(
           $.include_stmt,
           $.ccpinclude_stmt,
+          $.link_directive,
+          $.pkg_directive,
+          $.struct_decl,
+          $.hyi_const_decl,
           $.module_decl,
           $.module_header,
           $.class_decl,
@@ -57,6 +62,49 @@ module.exports = grammar({
     module_path: ($) => seq($.identifier, repeat(seq(".", $.identifier))),
 
     ccpinclude_stmt: ($) => seq("ccpinclude", $.string_literal),
+
+    // ── .hyi vendor directives ──────────────────────────────────────────────
+    // link "raylib"  — native library to link against
+    // pkg "sdl2"     — pkg-config package name
+    link_directive: ($) => seq("link", field("library", $.string_literal)),
+
+    pkg_directive: ($) => seq("pkg", field("package", $.string_literal)),
+
+    // struct Name { type field ... } — C-layout struct (bindgen output)
+    struct_decl: ($) =>
+      seq(
+        optional("public"),
+        "struct",
+        field("name", $.identifier),
+        "{",
+        repeat($.struct_field),
+        "}",
+      ),
+
+    struct_field: ($) =>
+      seq(field("type", $.type), field("name", $.identifier), optional(";")),
+
+    // const NAME = VALUE — typeless constant (bindgen output, no semicolon).
+    // Value is a bounded literal or simple call so it can't swallow the
+    // following line (there is no terminator).
+    hyi_const_decl: ($) =>
+      seq(
+        "const",
+        field("name", $.identifier),
+        "=",
+        field("value", $.hyi_const_value),
+      ),
+
+    hyi_const_value: ($) =>
+      prec.right(
+        choice(
+          seq(optional("-"), choice($.integer_literal, $.float_literal)),
+          $.string_literal,
+          $.bool_literal,
+          seq($.identifier, "(", commaSep($.hyi_const_value), ")"),
+          $.identifier,
+        ),
+      ),
 
     // ── Enum declarations ────────────────────────────────────────────────────
     enum_decl: ($) =>
@@ -183,7 +231,7 @@ module.exports = grammar({
         optional(choice("public", "private")),
         field("type", $.type),
         field("name", $.identifier),
-        ";",
+        optional(";"),
       ),
 
     class_body: ($) => repeat1($.class_member),
@@ -724,6 +772,7 @@ module.exports = grammar({
         optional($.param_list),
         ")",
         optional(seq("->", field("return_type", $.type))),
+        optional(field("body", $.block)),
       ),
   },
 });

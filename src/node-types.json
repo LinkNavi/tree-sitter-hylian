@@ -313,6 +313,10 @@
           "named": true
         },
         {
+          "type": "interface_decl",
+          "named": true
+        },
+        {
           "type": "method_decl",
           "named": true
         }
@@ -370,6 +374,11 @@
         ]
       }
     }
+  },
+  {
+    "type": "const",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "const_var_stmt",
@@ -703,6 +712,10 @@
           "named": true
         },
         {
+          "type": "ternary_expr",
+          "named": true
+        },
+        {
           "type": "tuple_expr",
           "named": true
         },
@@ -892,6 +905,67 @@
     }
   },
   {
+    "type": "hyi_const_decl",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "hyi_const_value",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "hyi_const_value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "bool_literal",
+          "named": true
+        },
+        {
+          "type": "float_literal",
+          "named": true
+        },
+        {
+          "type": "hyi_const_value",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "integer_literal",
+          "named": true
+        },
+        {
+          "type": "string_literal",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "identifier_expr",
     "named": true,
     "fields": {},
@@ -1017,6 +1091,68 @@
         "types": [
           {
             "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "interface_decl",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "return_type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "param_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "link_directive",
+    "named": true,
+    "fields": {
+      "library": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string_literal",
             "named": true
           }
         ]
@@ -1188,6 +1324,22 @@
     }
   },
   {
+    "type": "module_header",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "module_path",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "module_member",
     "named": true,
     "fields": {},
@@ -1201,6 +1353,10 @@
         },
         {
           "type": "func_decl",
+          "named": true
+        },
+        {
+          "type": "interface_decl",
           "named": true
         },
         {
@@ -1336,6 +1492,37 @@
     }
   },
   {
+    "type": "pkg_directive",
+    "named": true,
+    "fields": {
+      "package": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string_literal",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "postfix_array_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "postfix_expr",
     "named": true,
     "fields": {
@@ -1363,6 +1550,21 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "postfix_ref_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "type",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1461,11 +1663,31 @@
           "named": true
         },
         {
+          "type": "hyi_const_decl",
+          "named": true
+        },
+        {
           "type": "include_stmt",
           "named": true
         },
         {
+          "type": "interface_decl",
+          "named": true
+        },
+        {
+          "type": "link_directive",
+          "named": true
+        },
+        {
           "type": "module_decl",
+          "named": true
+        },
+        {
+          "type": "module_header",
+          "named": true
+        },
+        {
+          "type": "pkg_directive",
           "named": true
         },
         {
@@ -1474,6 +1696,10 @@
         },
         {
           "type": "static_var_stmt",
+          "named": true
+        },
+        {
+          "type": "struct_decl",
           "named": true
         },
         {
@@ -1683,6 +1909,58 @@
     }
   },
   {
+    "type": "struct_decl",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "struct_field",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "struct_field",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "struct_literal_expr",
     "named": true,
     "fields": {
@@ -1761,6 +2039,42 @@
     }
   },
   {
+    "type": "ternary_expr",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "else": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "then": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "tuple_expr",
     "named": true,
     "fields": {},
@@ -1808,6 +2122,14 @@
         },
         {
           "type": "multi_type",
+          "named": true
+        },
+        {
+          "type": "postfix_array_type",
+          "named": true
+        },
+        {
+          "type": "postfix_ref_type",
           "named": true
         },
         {
@@ -2142,6 +2464,10 @@
     "named": false
   },
   {
+    "type": "->",
+    "named": false
+  },
+  {
     "type": ".",
     "named": false
   },
@@ -2238,6 +2564,10 @@
     "named": false
   },
   {
+    "type": "asm",
+    "named": false
+  },
+  {
     "type": "asm_content",
     "named": true
   },
@@ -2271,7 +2601,7 @@
   },
   {
     "type": "const",
-    "named": true
+    "named": false
   },
   {
     "type": "continue",
@@ -2312,6 +2642,10 @@
   {
     "type": "float_literal",
     "named": true
+  },
+  {
+    "type": "fn",
+    "named": false
   },
   {
     "type": "for",
@@ -2371,6 +2705,10 @@
     "extra": true
   },
   {
+    "type": "link",
+    "named": false
+  },
+  {
     "type": "module",
     "named": false
   },
@@ -2396,6 +2734,10 @@
   },
   {
     "type": "packed",
+    "named": false
+  },
+  {
+    "type": "pkg",
     "named": false
   },
   {
@@ -2425,6 +2767,10 @@
   {
     "type": "string_literal",
     "named": true
+  },
+  {
+    "type": "struct",
+    "named": false
   },
   {
     "type": "switch",

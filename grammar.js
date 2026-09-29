@@ -4,15 +4,13 @@
 module.exports = grammar({
   name: "hylian",
 
-  extras: ($) => [/\s/, $.line_comment, $.target_annotation],
+  extras: ($) => [/\s/, $.line_comment, $.block_comment, $.target_annotation],
 
   word: ($) => $.identifier,
 
   conflicts: ($) => [
     [$.func_decl, $.method_decl],
     [$.type, $.identifier_expr],
-    [$.tuple_type, $.paren_expr],
-    [$.tuple_expr, $.paren_expr],
     [$.module_decl, $.func_decl],
     [$.rawptr_type, $.postfix_array_type],
     [$.rawptr_type, $.postfix_ref_type],
@@ -20,7 +18,6 @@ module.exports = grammar({
     [$.ref_type, $.postfix_ref_type],
     [$.interface_decl, $.postfix_ref_type],
     [$.cast_expr, $.binary_expr],
-    [$.hyi_const_decl, $.const],
   ],
 
   rules: {
@@ -29,13 +26,10 @@ module.exports = grammar({
         choice(
           $.include_stmt,
           $.ccpinclude_stmt,
-          $.link_directive,
-          $.pkg_directive,
-          $.struct_decl,
-          $.hyi_const_decl,
           $.module_decl,
           $.module_header,
           $.class_decl,
+          $.struct_decl,
           $.union_class_decl,
           $.func_decl,
           $.interface_decl,
@@ -43,8 +37,17 @@ module.exports = grammar({
           $.const_var_stmt,
           $.static_array_stmt,
           $.enum_decl,
+          $.typedef_stmt,
+          $.global_var_stmt,
         ),
       ),
+
+    // `typedef int myint;` - a type alias (resolved at parse time by the compiler)
+    typedef_stmt: ($) => seq("typedef", field("type", $.type), field("name", $.identifier), ";"),
+
+    // `int counter = 0;` at top level: same as `static int counter = 0;`
+    global_var_stmt: ($) =>
+      seq(field("type", $.type), field("name", $.identifier), "=", field("value", $.expression), ";"),
 
     // ── Target annotation ───────────────────────────────────────────────────
     // @target(linux) / @target(macos) — conditional compilation marker.
@@ -54,6 +57,7 @@ module.exports = grammar({
 
     // ── Comments ────────────────────────────────────────────────────────────
     line_comment: (_) => token(seq("//", /.*/)),
+    block_comment: (_) => token(seq("/*", /[^*]*\*+([^/*][^*]*\*+)*/, "/")),
 
     // ── Includes ────────────────────────────────────────────────────────────
     include_stmt: ($) =>
@@ -61,50 +65,7 @@ module.exports = grammar({
 
     module_path: ($) => seq($.identifier, repeat(seq(".", $.identifier))),
 
-    ccpinclude_stmt: ($) => seq("ccpinclude", $.string_literal),
-
-    // ── .hyi vendor directives ──────────────────────────────────────────────
-    // link "raylib"  — native library to link against
-    // pkg "sdl2"     — pkg-config package name
-    link_directive: ($) => seq("link", field("library", $.string_literal)),
-
-    pkg_directive: ($) => seq("pkg", field("package", $.string_literal)),
-
-    // struct Name { type field ... } — C-layout struct (bindgen output)
-    struct_decl: ($) =>
-      seq(
-        optional("public"),
-        "struct",
-        field("name", $.identifier),
-        "{",
-        repeat($.struct_field),
-        "}",
-      ),
-
-    struct_field: ($) =>
-      seq(field("type", $.type), field("name", $.identifier), optional(";")),
-
-    // const NAME = VALUE — typeless constant (bindgen output, no semicolon).
-    // Value is a bounded literal or simple call so it can't swallow the
-    // following line (there is no terminator).
-    hyi_const_decl: ($) =>
-      seq(
-        "const",
-        field("name", $.identifier),
-        "=",
-        field("value", $.hyi_const_value),
-      ),
-
-    hyi_const_value: ($) =>
-      prec.right(
-        choice(
-          seq(optional("-"), choice($.integer_literal, $.float_literal)),
-          $.string_literal,
-          $.bool_literal,
-          seq($.identifier, "(", commaSep($.hyi_const_value), ")"),
-          $.identifier,
-        ),
-      ),
+    ccpinclude_stmt: ($) => seq("ccpinclude", $.string_literal, ";"),
 
     // ── Enum declarations ────────────────────────────────────────────────────
     enum_decl: ($) =>
@@ -133,7 +94,6 @@ module.exports = grammar({
             $.array_type,
             $.postfix_array_type,
             $.multi_type,
-            $.tuple_type,
             $.rawptr_type,
             $.ref_type,
             $.postfix_ref_type,
@@ -149,12 +109,10 @@ module.exports = grammar({
     // Postfix reference type: int&  (equivalent to &int)
     postfix_ref_type: ($) => seq($.type, "&"),
 
-    tuple_type: ($) =>
-      seq(
-        "(",
-        seq($.type, optional("?"), repeat1(seq(",", $.type, optional("?")))),
-        ")",
-      ),
+    // NOTE: there is deliberately no tuple_type here. Tuples were removed from
+    // the language (see compiler/ast.h - the tuple Type kind is gone), and a
+    // grammar that still accepted them made the editor happily highlight and
+    // fold syntax the compiler rejects outright.
 
     primitive_type: (_) =>
       choice(
@@ -165,6 +123,9 @@ module.exports = grammar({
         "float",
         "float32",
         "float64",
+        "double",
+        "char",
+        "byte",
         "Error",
         "usize",
         "isize",
@@ -211,6 +172,23 @@ module.exports = grammar({
         "}",
       ),
 
+    // ── Struct declarations ──────────────────────────────────────────────────
+    // `struct Point { int x; int y; int sum() { ... } }`
+    // A by-value aggregate: public fields, methods allowed, NO constructor
+    // (that's what `class` is for). Shares class_body, so fields and methods
+    // parse identically inside either — including methods, which is the whole
+    // point of the C++-shaped syntax.
+    struct_decl: ($) =>
+      seq(
+        optional("packed"),
+        optional("public"),
+        "struct",
+        field("name", $.identifier),
+        "{",
+        optional($.class_body),
+        "}",
+      ),
+
     // ── Union class declarations ─────────────────────────────────────────────
     // `union class Foo { ... }` — all fields share offset 0, size = max field
     union_class_decl: ($) =>
@@ -231,7 +209,7 @@ module.exports = grammar({
         optional(choice("public", "private")),
         field("type", $.type),
         field("name", $.identifier),
-        optional(";"),
+        ";",
       ),
 
     class_body: ($) => repeat1($.class_member),
@@ -271,7 +249,9 @@ module.exports = grammar({
     // ── Function declarations ────────────────────────────────────────────────
     func_decl: ($) =>
       seq(
-        optional("public"),
+        // `static` = file-private helper (`static int _helper(int x) { ... }`);
+        // the compiler takes `static` or `public`, not both
+        optional(choice($.static, "public")),
         optional("naked"),
         field("return_type", $.type),
         optional("?"),
@@ -287,7 +267,8 @@ module.exports = grammar({
 
     param: ($) =>
       choice(
-        seq(field("type", $.type), field("name", $.identifier)),
+        seq(field("type", $.type), field("name", $.identifier),
+            optional(seq("=", field("default", $.expression)))),
         seq(field("name", $.identifier), ":", field("type", $.type)),
       ),
 
@@ -300,6 +281,7 @@ module.exports = grammar({
         $.declare_assign_stmt,
         $.assign_stmt,
         $.compound_assign_stmt,
+        $.target_compound_assign_stmt,
         $.member_assign_stmt,
         $.index_assign_stmt,
         $.return_stmt,
@@ -307,6 +289,9 @@ module.exports = grammar({
         $.while_stmt,
         $.for_stmt,
         $.for_in_stmt,
+        $.for_range_stmt,
+        $.do_while_stmt,
+        $.local_array_stmt,
         $.switch_stmt,
         $.break_stmt,
         $.continue_stmt,
@@ -340,9 +325,49 @@ module.exports = grammar({
     compound_assign_stmt: ($) =>
       seq(
         field("name", $.identifier),
-        field("op", choice("+=", "-=", "*=", "/=", "%=")),
+        field("op", $.compound_op),
         field("value", $.expression),
         ";",
+      ),
+
+    compound_op: (_) =>
+      choice("+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "|=", "^="),
+
+    // p.x += 1;   a[i] <<= 2;   *ptr |= 4;
+    target_compound_assign_stmt: ($) =>
+      seq(
+        field("target", choice($.member_expr, $.index_expr, $.deref_expr)),
+        field("op", $.compound_op),
+        field("value", $.expression),
+        ";",
+      ),
+
+    // `int buf[16];` - a zero-filled local array
+    local_array_stmt: ($) =>
+      seq(
+        field("type", $.type),
+        field("name", $.identifier),
+        "[",
+        field("size", $.expression),
+        "]",
+        ";",
+      ),
+
+    do_while_stmt: ($) =>
+      seq("do", $.block, "while", "(", field("condition", $.expression), ")", ";"),
+
+    // for (i in 0..10) / for (i in 0..=10)
+    for_range_stmt: ($) =>
+      seq(
+        "for",
+        "(",
+        field("variable", $.identifier),
+        "in",
+        field("start", $.expression),
+        choice("..", "..="),
+        field("end", $.expression),
+        ")",
+        $.block,
       ),
 
     member_assign_stmt: ($) =>
@@ -409,6 +434,9 @@ module.exports = grammar({
         seq($.type, $.identifier, "=", $.expression),
         seq($.type, $.identifier),
         seq($.identifier, "=", $.expression),
+        seq($.identifier, choice("++", "--")),
+        seq(choice("++", "--"), $.identifier),
+        seq($.identifier, $.compound_op, $.expression),
       ),
 
     for_in_stmt: ($) =>
@@ -520,7 +548,8 @@ module.exports = grammar({
 
     break_stmt: (_) => seq("break", ";"),
     continue_stmt: (_) => seq("continue", ";"),
-    defer_stmt: ($) => seq("defer", $.expression, ";"),
+    defer_stmt: ($) =>
+      seq("defer", choice(seq($.expression, ";"), $.block)),
 
     expr_stmt: ($) => seq($.expression, ";"),
 
@@ -541,11 +570,11 @@ module.exports = grammar({
         $.string_literal,
         $.float_literal,
         $.integer_literal,
+        $.char_literal,
         $.bool_literal,
         $.nil_literal,
         $.identifier_expr,
         $.paren_expr,
-        $.tuple_expr,
         $.volatile_read_expr,
         $.cast_expr,
         $.as_cast_expr,
@@ -572,8 +601,7 @@ module.exports = grammar({
         ),
       ),
 
-    tuple_expr: ($) =>
-      seq("(", $.expression, repeat1(seq(",", $.expression)), ")"),
+    // NOTE: no tuple_expr either - see the tuple_type note above.
 
     binary_expr: ($) =>
       choice(
@@ -625,7 +653,7 @@ module.exports = grammar({
       ),
 
     size_of_expr: ($) =>
-      prec(9, seq("size_of", "(", field("type_name", $.identifier), ")")),
+      prec(9, seq(choice("size_of", "sizeof"), "(", field("type_name", $.type), ")")),
 
     addrof_fn_expr: ($) =>
       prec(
@@ -724,10 +752,26 @@ module.exports = grammar({
     string_literal: (_) =>
       token(seq('"', repeat(choice(/[^"\\]/, /\\[\s\S]/)), '"')),
 
-    float_literal: (_) => token(seq(/[0-9]+/, ".", /[0-9]+/)),
+    float_literal: (_) =>
+      token(
+        choice(
+          seq(/[0-9][0-9_]*/, ".", /[0-9][0-9_]*/, optional(/[eE][+-]?[0-9]+/)),
+          seq(/[0-9][0-9_]*/, /[eE][+-]?[0-9]+/),
+        ),
+      ),
 
     integer_literal: (_) =>
-      token(choice(/0[xX][0-9a-fA-F][0-9a-fA-F_]*/, /[0-9][0-9_]*/)),
+      token(
+        choice(
+          /0[xX][0-9a-fA-F][0-9a-fA-F_]*/,
+          /0[bB][01][01_]*/,
+          /0[oO][0-7][0-7_]*/,
+          /[0-9][0-9_]*/,
+        ),
+      ),
+
+    // 'a'  '\n'  '\x41' - an int holding the byte value
+    char_literal: (_) => token(/'([^\\'\n]|\\x[0-9a-fA-F]{1,2}|\\.)'/),
 
     bool_literal: (_) => choice("true", "false"),
 
@@ -772,7 +816,6 @@ module.exports = grammar({
         optional($.param_list),
         ")",
         optional(seq("->", field("return_type", $.type))),
-        optional(field("body", $.block)),
       ),
   },
 });

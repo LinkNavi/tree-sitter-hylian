@@ -11,5 +11,3 @@
 (union_class_body) @fold
 
 (module_decl) @fold
-
-(struct_decl) @fold

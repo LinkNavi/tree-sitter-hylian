@@ -4,12 +4,15 @@
   "if"
   "else"
   "while"
+  "do"
+  "typedef"
   "for"
   "in"
   "return"
   "break"
   "continue"
   "defer"
+  "asm"
   "switch"
   "case"
   "default"
@@ -44,6 +47,7 @@
   "cast"
   "as"
   "size_of"
+  "sizeof"
   "addrof_fn"
   "adrof_fn"
 ] @keyword.operator
@@ -52,32 +56,27 @@
 [
   "include"
   "ccpinclude"
-  "link"
-  "pkg"
 ] @keyword.import
 
 [
-  (static)
-  (const)
   "naked"
   "packed"
   "public"
   "private"
 ] @keyword.modifier
 
+(static) @keyword.modifier
+(const) @keyword.modifier
+
 ; ── Types ───────────────────────────────────────────────────────────────────
 
+; every primitive (int, str, bool, void, float, float32, uint8, usize, ...)
+(primitive_type) @type.builtin
+
 [
-  "int"
-  "str"
-  "bool"
-  "void"
-  "Error"
   "array"
   "multi"
   "any"
-  "usize"
-  "isize"
 ] @type.builtin
 
 (class_decl
@@ -86,10 +85,10 @@
 (union_class_decl
   name: (identifier) @type)
 
-(enum_decl
+(struct_decl
   name: (identifier) @type)
 
-(struct_decl
+(enum_decl
   name: (identifier) @type)
 
 (new_expr
@@ -122,21 +121,10 @@
   type: (type
     (identifier) @type))
 
-(struct_field
-  type: (type
-    (identifier) @type))
-
 ; ── Enum variants ────────────────────────────────────────────────────────────
 
 (enum_variant
   name: (identifier) @constant)
-
-(hyi_const_decl
-  name: (identifier) @constant)
-
-(hyi_const_value
-  (identifier) @function.call
-  "(")
 
 ; ── Functions and methods ────────────────────────────────────────────────────
 
@@ -162,7 +150,7 @@
 
 ((call_expr
   function: (identifier) @function.builtin)
- (#match? @function.builtin "^(print|panic|Err|len|push|pop|exit)$"))
+ (#match? @function.builtin "^(print|println|panic|Err|len|push|pop|exit|syscall|memset|memcpy|size_of|sizeof|cli|sti|hlt|save_regs|restore_regs|iret|sysret|read_cr|write_cr|rdmsr|wrmsr|lgdt|lidt|ltr|invlpg|inb|outb|inw|outw|io_wait)$"))
 
 ; ── Variables ────────────────────────────────────────────────────────────────
 
@@ -194,9 +182,6 @@
   name: (identifier) @property)
 
 (union_field_decl
-  name: (identifier) @property)
-
-(struct_field
   name: (identifier) @property)
 
 (member_expr

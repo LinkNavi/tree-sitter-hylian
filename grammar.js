@@ -23,6 +23,7 @@ module.exports = grammar({
     [$.ref_type, $.postfix_ref_type],
     [$.interface_decl, $.postfix_ref_type],
     [$.cast_expr, $.binary_expr],
+    [$.method_call_expr, $.member_expr],
   ],
 
   rules: {
@@ -263,6 +264,7 @@ module.exports = grammar({
         field("return_type", $.type),
         optional("?"),
         field("name", $.identifier),
+        optional($.type_params),
         "(",
         optional($.param_list),
         ")",
@@ -727,6 +729,7 @@ module.exports = grammar({
           field("object", $.expression),
           ".",
           field("method", $.identifier),
+          optional($.type_args),
           "(",
           field("args", optional($.arg_list)),
           ")",

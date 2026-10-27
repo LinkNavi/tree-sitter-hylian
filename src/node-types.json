@@ -1388,6 +1388,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "type_args",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1425,6 +1435,10 @@
         },
         {
           "type": "param_list",
+          "named": true
+        },
+        {
+          "type": "type_params",
           "named": true
         }
       ]
